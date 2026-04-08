@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
     <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://cdnjs.cloudflare.com; style-src 'self' 'unsafe-inline';">
-    <title>Arbeitszeiterfassung Pro - Kompletter manueller Eintrag</title>
+    <title>Arbeitszeiterfassung Pro - Voll funktionsfähig</title>
     <style>
         :root {
             --primary: #1a73e8;
@@ -21,147 +21,51 @@
             --sick: #e67e22;
             --holiday: #27ae60;
             --absent: #95a5a6;
+            --backup: #6c5ce7;
         }
         
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
-        }
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; }
         
-        body {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            padding: 20px;
-            min-height: 100vh;
-        }
+        body { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 20px; min-height: 100vh; }
+        .container { max-width: 1400px; margin: 0 auto; }
         
-        .container {
-            max-width: 1400px;
-            margin: 0 auto;
-        }
-        
-        .card {
-            background: white;
-            border-radius: 15px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
-            overflow: hidden;
-            margin-bottom: 20px;
-        }
-        
-        .card-header {
-            background: linear-gradient(135deg, var(--primary), var(--info));
-            color: white;
-            padding: 20px;
-        }
-        
+        .card { background: white; border-radius: 15px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); overflow: hidden; margin-bottom: 20px; }
+        .card-header { background: linear-gradient(135deg, var(--primary), var(--info)); color: white; padding: 20px; }
         .card-header h1 { font-size: 1.5rem; margin-bottom: 5px; }
         .card-header p { opacity: 0.9; font-size: 0.9rem; }
         .card-body { padding: 20px; }
         
-        .security-badge {
-            background: #2ecc71;
-            color: white;
-            padding: 5px 10px;
-            border-radius: 20px;
-            font-size: 0.7rem;
-            display: inline-block;
-            margin-left: 10px;
-        }
+        .version-badge { background: rgba(255,255,255,0.2); padding: 4px 10px; border-radius: 20px; font-size: 0.7rem; display: inline-block; margin-left: 10px; }
+        .security-badge { background: #2ecc71; color: white; padding: 5px 10px; border-radius: 20px; font-size: 0.7rem; display: inline-block; margin-left: 10px; }
         
-        .status-section {
-            text-align: center;
-            padding: 20px;
-            background: var(--light);
-            border-radius: 10px;
-            margin-bottom: 20px;
-        }
-        
-        .status-indicator {
-            display: inline-block;
-            width: 12px;
-            height: 12px;
-            border-radius: 50%;
-            margin-right: 8px;
-            animation: pulse 1s infinite;
-        }
-        
-        @keyframes pulse {
-            0% { opacity: 1; transform: scale(1); }
-            100% { opacity: 0.5; transform: scale(1.2); }
-        }
-        
+        .status-section { text-align: center; padding: 20px; background: var(--light); border-radius: 10px; margin-bottom: 20px; }
+        .status-indicator { display: inline-block; width: 12px; height: 12px; border-radius: 50%; margin-right: 8px; animation: pulse 1s infinite; }
+        @keyframes pulse { 0% { opacity: 1; transform: scale(1); } 100% { opacity: 0.5; transform: scale(1.2); } }
         .status-working .status-indicator { background: var(--success); }
         .status-pause .status-indicator { background: var(--pause-color); }
         
         .current-time { font-size: 2.5rem; font-weight: 700; margin: 15px 0; font-family: monospace; }
+        .warning-message { background: var(--warning); color: var(--dark); padding: 10px; border-radius: 8px; margin-top: 10px; animation: blink 1s ease-in-out infinite; }
+        @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0.6; } }
         
-        .warning-message {
-            background: var(--warning);
-            color: var(--dark);
-            padding: 10px;
-            border-radius: 8px;
-            margin-top: 10px;
-            animation: blink 1s ease-in-out infinite;
-        }
+        .toolbar { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 20px; justify-content: center; }
+        .tool-btn { padding: 10px 15px; background: var(--backup); color: white; border: none; border-radius: 10px; cursor: pointer; font-size: 0.85rem; transition: all 0.2s; display: flex; align-items: center; gap: 6px; }
+        .tool-btn:hover { transform: translateY(-2px); opacity: 0.9; }
+        .tool-btn.danger { background: var(--danger); }
+        .tool-btn.warning { background: var(--warning); color: var(--dark); }
         
-        @keyframes blink {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0.6; }
-        }
-        
-        .pause-detail-card {
-            background: linear-gradient(135deg, #e3f2fd, #bbdef5);
-            border-radius: 12px;
-            padding: 15px;
-            margin-bottom: 20px;
-            border-left: 5px solid var(--pause-color);
-        }
-        
-        .time-detail {
-            display: flex;
-            justify-content: space-between;
-            gap: 15px;
-            flex-wrap: wrap;
-            margin-bottom: 20px;
-        }
-        
-        .time-box {
-            flex: 1;
-            background: var(--light);
-            padding: 12px;
-            border-radius: 10px;
-            text-align: center;
-        }
-        
+        .time-detail { display: flex; justify-content: space-between; gap: 15px; flex-wrap: wrap; margin-bottom: 20px; }
+        .time-box { flex: 1; background: var(--light); padding: 12px; border-radius: 10px; text-align: center; }
         .time-box .label { font-size: 0.7rem; color: var(--secondary); }
-        .time-box .value { font-size: 1.2rem; font-weight: 700; }
+        .time-box .value { font-size: 1.2rem; font-weight: 700; font-family: monospace; }
         .time-box.work .value { color: var(--success); }
         .time-box.pause .value { color: var(--pause-color); }
         .time-box.net .value { color: var(--primary); }
         
-        .button-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
-            gap: 10px;
-            margin-bottom: 20px;
-        }
-        
-        .btn {
-            padding: 12px 16px;
-            border: none;
-            border-radius: 10px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.2s;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-        }
+        .button-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 10px; margin-bottom: 20px; }
+        .btn { padding: 12px 16px; border: none; border-radius: 10px; font-weight: 600; cursor: pointer; transition: all 0.2s; display: flex; align-items: center; justify-content: center; gap: 8px; }
         .btn:active { transform: scale(0.97); }
         .btn:disabled { opacity: 0.5; cursor: not-allowed; }
-        
         .btn-primary { background: var(--success); color: white; }
         .btn-danger { background: var(--danger); color: white; }
         .btn-pause { background: var(--pause-color); color: white; }
@@ -172,31 +76,12 @@
         .btn-absent { background: var(--absent); color: white; }
         .btn-secondary { background: var(--secondary); color: white; }
         
-        .stats-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
-            gap: 10px;
-            margin-bottom: 20px;
-        }
-        
-        .stat-card {
-            background: var(--light);
-            padding: 10px;
-            border-radius: 10px;
-            text-align: center;
-        }
+        .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 10px; margin-bottom: 20px; }
+        .stat-card { background: var(--light); padding: 10px; border-radius: 10px; text-align: center; }
         .stat-card h4 { font-size: 0.7rem; color: var(--secondary); margin-bottom: 5px; }
         .stat-card .value { font-size: 1.2rem; font-weight: 700; color: var(--primary); }
         
-        .pause-timer-box {
-            background: var(--pause-color);
-            color: white;
-            padding: 15px;
-            border-radius: 10px;
-            text-align: center;
-            margin-bottom: 20px;
-        }
-        
+        .pause-timer-box { background: var(--pause-color); color: white; padding: 15px; border-radius: 10px; text-align: center; margin-bottom: 20px; }
         .pause-timer-box .time { font-size: 2rem; font-weight: 700; font-family: monospace; }
         
         .table-wrapper { overflow-x: auto; }
@@ -204,98 +89,45 @@
         th, td { padding: 10px; text-align: left; border-bottom: 1px solid var(--border); }
         th { background: var(--light); font-weight: 600; }
         
-        .type-badge {
-            padding: 4px 10px;
-            border-radius: 20px;
-            font-size: 0.7rem;
-            font-weight: 600;
-            display: inline-block;
-        }
+        .type-badge { padding: 4px 10px; border-radius: 20px; font-size: 0.7rem; font-weight: 600; display: inline-block; }
         .type-work { background: #e6f4ea; color: var(--success); }
         .type-vacation { background: #f3e5f5; color: var(--vacation); }
         .type-sick { background: #fff3e0; color: var(--sick); }
         .type-holiday { background: #e8f5e9; color: var(--holiday); }
         .type-absent { background: #f5f5f5; color: var(--absent); }
         
-        .action-btn {
-            background: none;
-            border: none;
-            cursor: pointer;
-            padding: 5px 8px;
-            margin: 0 2px;
-            border-radius: 5px;
-            font-size: 0.8rem;
-        }
+        .action-btn { background: none; border: none; cursor: pointer; padding: 5px 8px; margin: 0 2px; border-radius: 5px; font-size: 0.8rem; }
         .action-btn:hover { background: var(--light); }
         
-        .form-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-            gap: 12px;
-            margin-bottom: 15px;
-        }
+        .form-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 12px; margin-bottom: 15px; }
+        .form-group { display: flex; flex-direction: column; gap: 5px; }
+        .form-group label { font-size: 0.7rem; font-weight: 600; color: var(--secondary); }
+        .form-group input, .form-group select { padding: 10px; border: 1px solid var(--border); border-radius: 8px; font-size: 0.9rem; }
         
-        .form-group {
-            display: flex;
-            flex-direction: column;
-            gap: 5px;
-        }
-        
-        .form-group label {
-            font-size: 0.7rem;
-            font-weight: 600;
-            color: var(--secondary);
-        }
-        
-        .form-group input, .form-group select {
-            padding: 10px;
-            border: 1px solid var(--border);
-            border-radius: 8px;
-            font-size: 0.9rem;
-        }
-        
-        .form-group input:focus, .form-group select:focus {
-            outline: none;
-            border-color: var(--primary);
-        }
+        /* Monatskalender */
+        .calendar { display: grid; grid-template-columns: repeat(7, 1fr); gap: 5px; margin-top: 15px; }
+        .calendar-weekday { text-align: center; font-weight: bold; padding: 8px; background: var(--primary); color: white; border-radius: 8px; font-size: 0.8rem; }
+        .calendar-day { text-align: center; padding: 10px 5px; background: var(--light); border-radius: 8px; cursor: pointer; transition: all 0.2s; position: relative; min-height: 70px; }
+        .calendar-day:hover { background: var(--border); transform: scale(1.02); }
+        .calendar-day.today { background: var(--warning); color: var(--dark); font-weight: bold; }
+        .calendar-day.has-work { background: #e8f5e9; }
+        .calendar-day.has-vacation { background: #f3e5f5; }
+        .calendar-day .day-number { font-weight: bold; font-size: 1rem; }
+        .calendar-day .day-hours { font-size: 0.7rem; color: var(--success); margin-top: 4px; }
+        .calendar-day .day-icons { font-size: 0.8rem; margin-top: 4px; }
         
         @media (max-width: 768px) {
             body { padding: 10px; }
             .current-time { font-size: 1.8rem; }
             .btn { padding: 10px; font-size: 0.8rem; }
+            .calendar-day { min-height: 50px; padding: 5px; }
+            .calendar-day .day-number { font-size: 0.8rem; }
         }
         
-        .privacy-note {
-            font-size: 0.7rem;
-            color: var(--secondary);
-            text-align: center;
-            margin-top: 15px;
-            padding-top: 15px;
-            border-top: 1px solid var(--border);
-        }
-        
-        .modal {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0,0,0,0.5);
-            z-index: 1000;
-            justify-content: center;
-            align-items: center;
-        }
-        
-        .modal-content {
-            background: white;
-            border-radius: 15px;
-            padding: 20px;
-            max-width: 500px;
-            width: 90%;
-            max-height: 80vh;
-            overflow-y: auto;
-        }
+        .privacy-note { font-size: 0.7rem; color: var(--secondary); text-align: center; margin-top: 15px; padding-top: 15px; border-top: 1px solid var(--border); }
+        .update-info { background: #e8f5e9; border-left: 4px solid var(--success); padding: 10px; margin-bottom: 15px; border-radius: 8px; font-size: 0.8rem; display: none; }
+        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1000; justify-content: center; align-items: center; }
+        .modal-content { background: white; border-radius: 15px; padding: 20px; max-width: 500px; width: 90%; max-height: 80vh; overflow-y: auto; }
     </style>
 </head>
 <body>
@@ -303,55 +135,45 @@
         <div class="card">
             <div class="card-header">
                 <h1>⚡ Arbeitszeiterfassung Pro 
+                    <span class="version-badge" id="versionBadge">v2.0.0</span>
                     <span class="security-badge">🔒 Sicher & Verschlüsselt</span>
                 </h1>
-                <p>Vollständige manuelle Einträge | Alle Felder bearbeitbar | Automatische Pausen</p>
+                <p>Sekundengenaue Zeiterfassung | Backup & Wiederherstellung | Monatskalender | Update-fähig</p>
             </div>
             <div class="card-body">
-                <!-- Status Section -->
+                <div id="updateInfo" class="update-info">✅ <strong>Update verfügbar!</strong> <button id="applyUpdateBtn" style="background: var(--success); color: white; border: none; padding: 4px 12px; border-radius: 5px; cursor: pointer;">Jetzt updaten</button></div>
+                
+                <div class="toolbar">
+                    <button class="tool-btn" id="backupBtn">💾 Backup erstellen</button>
+                    <button class="tool-btn" id="restoreBackupBtn">🔄 Backup wiederherstellen</button>
+                    <button class="tool-btn" id="exportDataBtn">📤 Daten exportieren</button>
+                    <button class="tool-btn" id="importDataBtn">📥 Daten importieren</button>
+                    <button class="tool-btn" id="shareLinkBtn">🔗 Link teilen</button>
+                    <button class="tool-btn" id="yearlyCleanupBtn" style="background: var(--danger);">📅 Jahres-Cleanup</button>
+                </div>
+                
                 <div class="status-section" id="statusSection">
-                    <div id="statusText">
-                        <span class="status-indicator"></span>
-                        Bereit zum Start
-                    </div>
+                    <div id="statusText"><span class="status-indicator"></span> Bereit zum Start</div>
                     <div class="current-time" id="currentTime">--:--:--</div>
-                    <div id="warningMessage" style="display: none;" class="warning-message">
-                        ⚠️ Achtung! Sie haben 8 Stunden und 30 Minuten gearbeitet!
-                    </div>
+                    <div id="warningMessage" style="display: none;" class="warning-message">⚠️ Achtung! Sie haben 8 Stunden und 30 Minuten gearbeitet!</div>
                 </div>
                 
                 <div class="time-detail">
-                    <div class="time-box work">
-                        <div class="label">⏱️ Brutto-Arbeitszeit</div>
-                        <div class="value" id="grossTime">0:00:00</div>
-                    </div>
-                    <div class="time-box pause">
-                        <div class="label">⏸ Pause</div>
-                        <div class="value" id="pauseTotalTime">0:00:00</div>
-                    </div>
-                    <div class="time-box net">
-                        <div class="label">✅ Netto-Arbeitszeit</div>
-                        <div class="value" id="netTime">0:00:00</div>
-                    </div>
+                    <div class="time-box work"><div class="label">⏱️ Brutto</div><div class="value" id="grossTime">0:00:00</div></div>
+                    <div class="time-box pause"><div class="label">⏸ Pause</div><div class="value" id="pauseTotalTime">0:00:00</div></div>
+                    <div class="time-box net"><div class="label">✅ Netto</div><div class="value" id="netTime">0:00:00</div></div>
                 </div>
                 
-                <div class="pause-detail-card">
+                <div style="background: linear-gradient(135deg, #e3f2fd, #bbdef5); border-radius: 12px; padding: 15px; margin-bottom: 20px;">
                     <h3>⏸ Automatische Pausenregeln</h3>
-                    <div style="margin-top: 10px;">
-                        <span style="display: inline-block; padding: 4px 8px; background: #fff3e0; border-radius: 20px; margin: 4px;">📋 6+ Stunden → 30 Min Pause</span>
-                        <span style="display: inline-block; padding: 4px 8px; background: #ffebee; border-radius: 20px; margin: 4px;">📋 9+ Stunden → 45 Min Pause</span>
-                    </div>
-                    <div style="margin-top: 10px;">
-                        <strong>⚙️ Modus:</strong>
-                        <span id="pauseModeDisplay">🔄 Automatisch</span>
-                        <button id="togglePauseMode" style="margin-left: 10px; padding: 4px 8px; background: #6c5ce7; color: white; border: none; border-radius: 5px; cursor: pointer;">Umschalten</button>
-                    </div>
+                    <div><span style="display: inline-block; padding: 4px 8px; background: #fff3e0; border-radius: 20px; margin: 4px;">📋 6+ Stunden → 30 Min Pause</span><span style="display: inline-block; padding: 4px 8px; background: #ffebee; border-radius: 20px; margin: 4px;">📋 9+ Stunden → 45 Min Pause</span></div>
+                    <div style="margin-top: 10px;"><strong>⚙️ Modus:</strong> <span id="pauseModeDisplay">🔄 Automatisch</span> <button id="togglePauseMode" style="margin-left: 10px; padding: 4px 8px; background: #6c5ce7; color: white; border: none; border-radius: 5px; cursor: pointer;">Umschalten</button></div>
                 </div>
                 
                 <div id="pauseTimerDisplay" class="pause-timer-box" style="display: none;">
                     <div>⏸ PAUSE LÄUFT</div>
                     <div class="time" id="pauseTimer">00:00:00</div>
-                    <button class="btn btn-resume" id="resumeWorkBtn" style="margin-top: 10px;">▶ Arbeit fortsetzen</button>
+                    <button class="btn btn-resume" id="resumeWorkBtn">▶ Arbeit fortsetzen</button>
                 </div>
                 
                 <div class="button-grid">
@@ -378,61 +200,18 @@
                     <div class="stat-card"><h4>Krank</h4><div class="value" id="sickDays">0</div></div>
                 </div>
                 
-                <!-- KOMPLETTER MANUELLER EINTRAG - ALLE FELDER -->
-                <div class="card" style="margin-top: 20px; background: var(--light);">
+                <!-- Monatskalender -->
+                <div class="card" style="margin-top: 20px;">
                     <div class="card-header" style="background: var(--secondary);">
-                        <h3>✏️ Kompletter manueller Eintrag</h3>
-                        <p>Alle Felder können individuell ausgefüllt werden</p>
+                        <h3>📅 Monatskalender <span id="calendarMonthYear"></span></h3>
+                        <div style="display: flex; gap: 10px; margin-top: 10px;">
+                            <button id="prevMonthBtn" class="btn btn-secondary" style="background: white; color: var(--dark);">◀ Vorheriger</button>
+                            <button id="nextMonthBtn" class="btn btn-secondary" style="background: white; color: var(--dark);">Nächster ▶</button>
+                            <button id="todayMonthBtn" class="btn btn-primary" style="background: white; color: var(--dark);">📅 Heute</button>
+                        </div>
                     </div>
                     <div class="card-body">
-                        <div class="form-grid">
-                            <div class="form-group">
-                                <label>📅 Datum</label>
-                                <input type="date" id="manualDate" />
-                            </div>
-                            <div class="form-group">
-                                <label>📋 Typ</label>
-                                <select id="manualType">
-                                    <option value="work">Arbeit</option>
-                                    <option value="vacation">Urlaub</option>
-                                    <option value="sick">Krank</option>
-                                    <option value="holiday">Feiertag</option>
-                                    <option value="absent">Fehltag</option>
-                                </select>
-                            </div>
-                            <div class="form-group">
-                                <label>🕐 Startzeit</label>
-                                <input type="time" id="manualStart" value="08:00" />
-                            </div>
-                            <div class="form-group">
-                                <label>🕑 Endzeit</label>
-                                <input type="time" id="manualEnd" value="17:00" />
-                            </div>
-                            <div class="form-group">
-                                <label>📊 Brutto (Stunden)</label>
-                                <input type="number" id="manualBrutto" step="0.01" placeholder="z.B. 8.00" />
-                            </div>
-                            <div class="form-group">
-                                <label>⏸ Pause (Stunden)</label>
-                                <input type="number" id="manualPause" step="0.01" placeholder="z.B. 0.75" />
-                            </div>
-                            <div class="form-group">
-                                <label>✅ Netto (Stunden)</label>
-                                <input type="number" id="manualNetto" step="0.01" placeholder="wird berechnet" readonly style="background:#f5f5f5;" />
-                            </div>
-                            <div class="form-group">
-                                <label>📝 Notiz</label>
-                                <input type="text" id="manualNote" placeholder="Optional" maxlength="100" />
-                            </div>
-                        </div>
-                        <div style="display: flex; gap: 10px; margin-top: 10px;">
-                            <button id="calculateNettoBtn" class="btn btn-primary" style="background: var(--info);">🔢 Netto berechnen</button>
-                            <button id="saveManualEntryBtn" class="btn btn-primary">💾 Eintrag speichern</button>
-                            <button id="clearManualFormBtn" class="btn btn-secondary">🗑 Formular leeren</button>
-                        </div>
-                        <div style="margin-top: 10px; font-size: 0.7rem; color: var(--secondary);">
-                            💡 Tipp: Bei leerem Pausenfeld wird automatisch die gesetzliche Pause berechnet (30min bei 6+h, 45min bei 9+h)
-                        </div>
+                        <div id="calendarContainer"></div>
                     </div>
                 </div>
                 
@@ -440,22 +219,38 @@
                 <div class="card" style="margin-top: 20px; background: var(--light);">
                     <div class="card-body">
                         <h3>📊 Monatsberechnung</h3>
-                        <div style="display: flex; gap: 10px; flex-wrap: wrap; margin-top: 10px;">
+                        <div style="display: flex; gap: 10px; flex-wrap: wrap;">
                             <button id="formula160" class="btn btn-primary" style="background: var(--primary);">160 h/Monat (40×12÷3)</button>
                             <button id="formula173" class="btn btn-primary" style="background: var(--secondary);">173.33 h/Monat (40×13÷3)</button>
                         </div>
                     </div>
                 </div>
                 
-                <!-- Monatsübersicht -->
-                <div class="card" style="margin-top: 20px;">
+                <!-- Manueller Eintrag -->
+                <div class="card" style="margin-top: 20px; background: var(--light);">
                     <div class="card-header" style="background: var(--secondary);">
-                        <h3>📅 Monatsübersicht</h3>
+                        <h3>✏️ Kompletter manueller Eintrag</h3>
                     </div>
-                    <div class="card-body" id="monthDaysList"></div>
+                    <div class="card-body">
+                        <div class="form-grid">
+                            <div class="form-group"><label>📅 Datum</label><input type="date" id="manualDate" /></div>
+                            <div class="form-group"><label>📋 Typ</label><select id="manualType"><option value="work">Arbeit</option><option value="vacation">Urlaub</option><option value="sick">Krank</option><option value="holiday">Feiertag</option><option value="absent">Fehltag</option></select></div>
+                            <div class="form-group"><label>🕐 Startzeit</label><input type="text" id="manualStart" placeholder="08:00:00" value="08:00:00" /></div>
+                            <div class="form-group"><label>🕑 Endzeit</label><input type="text" id="manualEnd" placeholder="17:00:00" value="17:00:00" /></div>
+                            <div class="form-group"><label>📊 Brutto (Std)</label><input type="number" id="manualBrutto" step="0.01" placeholder="8.00" /></div>
+                            <div class="form-group"><label>⏸ Pause (Std)</label><input type="number" id="manualPause" step="0.01" placeholder="0.75" /></div>
+                            <div class="form-group"><label>✅ Netto (Std)</label><input type="number" id="manualNetto" step="0.01" placeholder="wird berechnet" readonly style="background:#f5f5f5;" /></div>
+                            <div class="form-group"><label>📝 Notiz</label><input type="text" id="manualNote" placeholder="Optional" maxlength="100" /></div>
+                        </div>
+                        <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+                            <button id="calculateNettoBtn" class="btn btn-primary" style="background: var(--info);">🔢 Netto berechnen</button>
+                            <button id="saveManualEntryBtn" class="btn btn-primary">💾 Eintrag speichern</button>
+                            <button id="clearManualFormBtn" class="btn btn-secondary">🗑 Formular leeren</button>
+                        </div>
+                    </div>
                 </div>
                 
-                <!-- Historie Tabelle -->
+                <!-- Historie -->
                 <div class="card" style="margin-top: 20px;">
                     <div class="card-header" style="background: var(--secondary);">
                         <h3>📋 Arbeitshistorie</h3>
@@ -464,9 +259,7 @@
                     <div class="card-body">
                         <div class="table-wrapper">
                             <table>
-                                <thead>
-                                    <tr><th>Datum</th><th>Typ</th><th>Start</th><th>Ende</th><th>Brutto</th><th>Pause</th><th>Netto</th><th>Notiz</th><th>Aktion</th></tr>
-                                </thead>
+                                <thead><tr><th>Datum</th><th>Typ</th><th>Start</th><th>Ende</th><th>Brutto</th><th>Pause</th><th>Netto</th><th>Notiz</th><th>Aktion</th></tr></thead>
                                 <tbody id="historyBody"></tbody>
                             </table>
                         </div>
@@ -474,111 +267,34 @@
                 </div>
                 
                 <div class="privacy-note">
-                    🔒 <strong>Sicherheit:</strong> 100% lokale Speicherung | Keine Cloud | DSGVO-konform | Für immer kostenlos
+                    🔒 <strong>Sicherheit:</strong> 100% lokale Speicherung | Keine Cloud | DSGVO-konform | Für immer kostenlos<br>
+                    ⏱️ <strong>Sekundengenaue Erfassung</strong> | 💾 <strong>Backup & Wiederherstellung</strong> | 📅 <strong>Monatskalender</strong>
                 </div>
             </div>
         </div>
     </div>
     
-    <!-- Modal für Bearbeitung -->
     <div id="editModal" class="modal">
         <div class="modal-content">
             <h3>📝 Eintrag bearbeiten</h3>
-            <div class="form-group">
-                <label>Datum</label>
-                <input type="date" id="editDate" />
-            </div>
-            <div class="form-group">
-                <label>Typ</label>
-                <select id="editType">
-                    <option value="work">Arbeit</option>
-                    <option value="vacation">Urlaub</option>
-                    <option value="sick">Krank</option>
-                    <option value="holiday">Feiertag</option>
-                    <option value="absent">Fehltag</option>
-                </select>
-            </div>
-            <div class="form-group">
-                <label>Startzeit</label>
-                <input type="time" id="editStart" />
-            </div>
-            <div class="form-group">
-                <label>Endzeit</label>
-                <input type="time" id="editEnd" />
-            </div>
-            <div class="form-group">
-                <label>Brutto (Stunden)</label>
-                <input type="number" id="editBrutto" step="0.01" />
-            </div>
-            <div class="form-group">
-                <label>Pause (Stunden)</label>
-                <input type="number" id="editPause" step="0.01" />
-            </div>
-            <div class="form-group">
-                <label>Netto (Stunden)</label>
-                <input type="number" id="editNetto" step="0.01" />
-            </div>
-            <div class="form-group">
-                <label>Notiz</label>
-                <input type="text" id="editNote" maxlength="100" />
-            </div>
-            <div class="modal-buttons" style="display: flex; gap: 10px; margin-top: 15px;">
-                <button id="saveEditBtn" class="btn btn-primary">💾 Speichern</button>
-                <button id="closeModalBtn" class="btn btn-secondary">❌ Abbrechen</button>
-            </div>
+            <div class="form-group"><label>Datum</label><input type="date" id="editDate" /></div>
+            <div class="form-group"><label>Typ</label><select id="editType"><option value="work">Arbeit</option><option value="vacation">Urlaub</option><option value="sick">Krank</option><option value="holiday">Feiertag</option><option value="absent">Fehltag</option></select></div>
+            <div class="form-group"><label>Startzeit</label><input type="text" id="editStart" /></div>
+            <div class="form-group"><label>Endzeit</label><input type="text" id="editEnd" /></div>
+            <div class="form-group"><label>Brutto</label><input type="number" id="editBrutto" step="0.01" /></div>
+            <div class="form-group"><label>Pause</label><input type="number" id="editPause" step="0.01" /></div>
+            <div class="form-group"><label>Netto</label><input type="number" id="editNetto" step="0.01" /></div>
+            <div class="form-group"><label>Notiz</label><input type="text" id="editNote" maxlength="100" /></div>
+            <div style="display: flex; gap: 10px; margin-top: 15px;"><button id="saveEditBtn" class="btn btn-primary">💾 Speichern</button><button id="closeModalBtn" class="btn btn-secondary">❌ Abbrechen</button></div>
         </div>
     </div>
     
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
     <script>
         (function() {
-            // ==================== HELFER ====================
-            function escapeHtml(str) {
-                if (!str) return '';
-                return str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#39;');
-            }
-            
-            function formatDateToDE(date) {
-                const d = date.getDate().toString().padStart(2, '0');
-                const m = (date.getMonth() + 1).toString().padStart(2, '0');
-                const y = date.getFullYear();
-                return `${d}.${m}.${y}`;
-            }
-            
-            function parseDEDateString(ddmmyyyy) {
-                const parts = ddmmyyyy.split('.');
-                return new Date(parts[2], parts[1] - 1, parts[0]);
-            }
-            
-            function getTodayKey() {
-                return new Date().toLocaleDateString('de-DE');
-            }
-            
-            function formatTimeFromHours(hours) {
-                const totalSeconds = Math.floor(hours * 3600);
-                const h = Math.floor(totalSeconds / 3600);
-                const m = Math.floor((totalSeconds % 3600) / 60);
-                const s = totalSeconds % 60;
-                return `${h.toString().padStart(2, '0')}:${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
-            }
-            
-            function formatTime(ms) {
-                const totalSeconds = Math.floor(ms / 1000);
-                const h = Math.floor(totalSeconds / 3600);
-                const m = Math.floor((totalSeconds % 3600) / 60);
-                const s = totalSeconds % 60;
-                return `${h.toString().padStart(2, '0')}:${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
-            }
-            
-            function calculateAutoPause(grossHours) {
-                if (grossHours >= 9) return 45 / 60;
-                if (grossHours >= 6) return 30 / 60;
-                return 0;
-            }
-            
-            function vibrate() {
-                if (navigator.vibrate) navigator.vibrate(500);
-            }
+            // ==================== SPEICHER SCHLÜSSEL ====================
+            const STORAGE_KEY = 'workHistory_pro_final';
+            const APP_VERSION = "2.0.0";
             
             // ==================== GLOBALE VARIABLEN ====================
             let workHistory = [];
@@ -592,23 +308,70 @@
             let autoPauseMode = true;
             let currentFormula = '160';
             let currentEditId = null;
+            let currentCalendarYear = new Date().getFullYear();
+            let currentCalendarMonth = new Date().getMonth();
             
-            // ==================== DATA LOADING ====================
-            try {
-                const saved = localStorage.getItem('workHistory_pro_v4');
-                if (saved) {
-                    const parsed = JSON.parse(saved);
-                    if (Array.isArray(parsed)) workHistory = parsed;
-                }
-            } catch (e) {}
+            // ==================== DATEN LADEN ====================
+            function loadData() {
+                try {
+                    const saved = localStorage.getItem(STORAGE_KEY);
+                    if (saved) {
+                        const parsed = JSON.parse(saved);
+                        if (Array.isArray(parsed)) {
+                            workHistory = parsed;
+                            console.log("Daten geladen:", workHistory.length, "Einträge");
+                        }
+                    }
+                } catch (e) { console.warn("Fehler beim Laden:", e); }
+                
+                try { autoPauseMode = localStorage.getItem('autoPauseMode') !== 'false'; } catch(e) {}
+                try { currentFormula = localStorage.getItem('currentFormula') || '160'; } catch(e) {}
+            }
             
-            try { autoPauseMode = localStorage.getItem('autoPauseMode') !== 'false'; } catch(e) {}
-            try { currentFormula = localStorage.getItem('currentFormula') || '160'; } catch(e) {}
+            // ==================== DATEN SPEICHERN ====================
+            function saveData() {
+                try {
+                    localStorage.setItem(STORAGE_KEY, JSON.stringify(workHistory));
+                    localStorage.setItem('autoPauseMode', autoPauseMode);
+                    localStorage.setItem('currentFormula', currentFormula);
+                    console.log("Daten gespeichert:", workHistory.length, "Einträge");
+                } catch (e) { console.warn("Fehler beim Speichern:", e); }
+            }
+            
+            // ==================== HELFER ====================
+            function escapeHtml(str) { if (!str) return ''; return str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#39;'); }
+            
+            function formatDateToDE(date) {
+                const d = date.getDate().toString().padStart(2, '0');
+                const m = (date.getMonth() + 1).toString().padStart(2, '0');
+                const y = date.getFullYear();
+                return `${d}.${m}.${y}`;
+            }
+            
+            function parseDEDateString(ddmmyyyy) {
+                const parts = ddmmyyyy.split('.');
+                return new Date(parts[2], parts[1] - 1, parts[0]);
+            }
+            
+            function getTodayKey() { return new Date().toLocaleDateString('de-DE'); }
+            
+            function formatTimeFromSeconds(totalSeconds) {
+                const h = Math.floor(totalSeconds / 3600);
+                const m = Math.floor((totalSeconds % 3600) / 60);
+                const s = totalSeconds % 60;
+                return `${h.toString().padStart(2, '0')}:${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
+            }
+            
+            function calculateAutoPause(grossHours) {
+                if (grossHours >= 9) return 45 / 60;
+                if (grossHours >= 6) return 30 / 60;
+                return 0;
+            }
+            
+            function vibrate() { if (navigator.vibrate) navigator.vibrate(500); }
             
             // ==================== MONATSZIEL ====================
-            function getMonthlyTarget() {
-                return currentFormula === '160' ? 160 : 173.33;
-            }
+            function getMonthlyTarget() { return currentFormula === '160' ? 160 : 173.33; }
             
             // ==================== STATISTIK ====================
             function getTodayNetHours() {
@@ -668,9 +431,9 @@
                     if (autoPauseMode && !isOnPause) pauseHours = Math.max(pauseHours, calculateAutoPause(grossHours));
                     const netHours = Math.max(0, grossHours - pauseHours);
                     
-                    document.getElementById('grossTime').textContent = formatTime(grossMs);
-                    document.getElementById('pauseTotalTime').textContent = formatTimeFromHours(pauseHours);
-                    document.getElementById('netTime').textContent = formatTimeFromHours(netHours);
+                    document.getElementById('grossTime').textContent = formatTimeFromSeconds(Math.floor(grossMs / 1000));
+                    document.getElementById('pauseTotalTime').textContent = formatTimeFromSeconds(Math.floor(pauseHours * 3600));
+                    document.getElementById('netTime').textContent = formatTimeFromSeconds(Math.floor(netHours * 3600));
                     
                     if (netHours >= 8.5 && netHours < 8.51) {
                         document.getElementById('warningMessage').style.display = 'block';
@@ -700,6 +463,7 @@
             
             function updateHistory() {
                 const tbody = document.getElementById('historyBody');
+                if (!tbody) return;
                 tbody.innerHTML = '';
                 const sorted = [...workHistory].reverse().slice(0, 30);
                 
@@ -723,44 +487,123 @@
                         row.innerHTML = `
                             <td>${escapeHtml(entry.date)}</td>
                             <td><span class="type-badge ${typeClass}">${escapeHtml(typeName)}</span></td>
-                            <td>-</td>
-                            <td>-</td>
-                            <td>-</td>
-                            <td>-</td>
-                            <td>-</td>
+                            <td>-</td><td>-</td><td>-</td><td>-</td><td>-</td>
                             <td>${escapeHtml(entry.note || '-')}</td>
                             <td><button class="edit-btn" data-id="${entry.id}">✏️</button> <button class="delete-btn" data-id="${entry.id}">🗑</button></td>
                         `;
                     }
                 }
                 
-                // Edit-Buttons
                 document.querySelectorAll('.edit-btn').forEach(btn => {
-                    btn.addEventListener('click', (e) => {
-                        const id = parseInt(btn.getAttribute('data-id'));
-                        openEditModal(id);
-                    });
+                    btn.addEventListener('click', () => { const id = parseInt(btn.getAttribute('data-id')); openEditModal(id); });
                 });
-                
-                // Delete-Buttons
                 document.querySelectorAll('.delete-btn').forEach(btn => {
-                    btn.addEventListener('click', (e) => {
+                    btn.addEventListener('click', () => {
                         const id = parseInt(btn.getAttribute('data-id'));
                         if (confirm('Eintrag löschen?')) {
                             workHistory = workHistory.filter(e => e.id !== id);
-                            localStorage.setItem('workHistory_pro_v4', JSON.stringify(workHistory));
+                            saveData();
                             updateAll();
                         }
                     });
                 });
             }
             
+            // ==================== MONATSKALENDER ====================
+            function renderCalendar() {
+                const container = document.getElementById('calendarContainer');
+                if (!container) return;
+                
+                const year = currentCalendarYear;
+                const month = currentCalendarMonth;
+                const firstDay = new Date(year, month, 1);
+                const lastDay = new Date(year, month + 1, 0);
+                const daysInMonth = lastDay.getDate();
+                const startWeekday = firstDay.getDay(); // 0 = Sonntag
+                
+                // Wochentage
+                const weekdays = ['SO', 'MO', 'DI', 'MI', 'DO', 'FR', 'SA'];
+                let html = '<div class="calendar">';
+                for (let i = 0; i < 7; i++) {
+                    html += `<div class="calendar-weekday">${weekdays[i]}</div>`;
+                }
+                
+                // Leere Tage am Anfang
+                let startOffset = startWeekday === 0 ? 6 : startWeekday - 1;
+                for (let i = 0; i < startOffset; i++) {
+                    html += `<div class="calendar-day" style="background: transparent;"></div>`;
+                }
+                
+                // Tage des Monats
+                const today = new Date();
+                const isCurrentMonth = (today.getFullYear() === year && today.getMonth() === month);
+                const todayDate = today.getDate();
+                
+                // Daten für jeden Tag sammeln
+                const dayData = {};
+                for (const entry of workHistory) {
+                    const entryDate = parseDEDateString(entry.date);
+                    if (entryDate.getFullYear() === year && entryDate.getMonth() === month) {
+                        const day = entryDate.getDate();
+                        if (!dayData[day]) dayData[day] = { work: 0, types: [] };
+                        if (entry.type === 'work') dayData[day].work += parseFloat(entry.netto) || 0;
+                        dayData[day].types.push(entry.type);
+                    }
+                }
+                
+                const typeIcons = { vacation: '🏖', sick: '🤒', holiday: '🎉', absent: '❌', work: '💼' };
+                
+                for (let day = 1; day <= daysInMonth; day++) {
+                    const data = dayData[day];
+                    const types = data ? data.types.map(t => typeIcons[t] || '').join(' ') : '';
+                    const hours = data ? data.work.toFixed(2) : '0';
+                    let dayClass = 'calendar-day';
+                    if (isCurrentMonth && day === todayDate) dayClass += ' today';
+                    if (data && data.work > 0) dayClass += ' has-work';
+                    if (data && data.types.includes('vacation')) dayClass += ' has-vacation';
+                    
+                    html += `<div class="${dayClass}" onclick="document.getElementById('manualDate').value='${year}-${(month+1).toString().padStart(2,'0')}-${day.toString().padStart(2,'0')}'">
+                        <div class="day-number">${day}</div>
+                        ${hours !== '0' ? `<div class="day-hours">${hours} h</div>` : ''}
+                        <div class="day-icons">${types}</div>
+                    </div>`;
+                }
+                
+                html += '</div>';
+                container.innerHTML = html;
+                document.getElementById('calendarMonthYear').innerHTML = `${new Date(year, month).toLocaleDateString('de-DE', { month: 'long', year: 'numeric' })}`;
+            }
+            
+            function prevMonth() {
+                currentCalendarMonth--;
+                if (currentCalendarMonth < 0) {
+                    currentCalendarMonth = 11;
+                    currentCalendarYear--;
+                }
+                renderCalendar();
+            }
+            
+            function nextMonth() {
+                currentCalendarMonth++;
+                if (currentCalendarMonth > 11) {
+                    currentCalendarMonth = 0;
+                    currentCalendarYear++;
+                }
+                renderCalendar();
+            }
+            
+            function todayMonth() {
+                currentCalendarYear = new Date().getFullYear();
+                currentCalendarMonth = new Date().getMonth();
+                renderCalendar();
+            }
+            
+            // ==================== EDIT MODAL ====================
             function openEditModal(id) {
                 const entry = workHistory.find(e => e.id === id);
                 if (!entry) return;
                 currentEditId = id;
                 
-                // Datum für input vorbereiten (yyyy-mm-dd)
                 let dateForInput = '';
                 if (entry.date) {
                     const parts = entry.date.split('.');
@@ -769,8 +612,8 @@
                 
                 document.getElementById('editDate').value = dateForInput;
                 document.getElementById('editType').value = entry.type;
-                document.getElementById('editStart').value = entry.startTime !== '-' ? entry.startTime : '08:00';
-                document.getElementById('editEnd').value = entry.endTime !== '-' ? entry.endTime : '17:00';
+                document.getElementById('editStart').value = entry.startTime !== '-' ? entry.startTime : '08:00:00';
+                document.getElementById('editEnd').value = entry.endTime !== '-' ? entry.endTime : '17:00:00';
                 document.getElementById('editBrutto').value = entry.brutto || '';
                 document.getElementById('editPause').value = entry.pause || '';
                 document.getElementById('editNetto').value = entry.netto || '';
@@ -796,26 +639,11 @@
                 const index = workHistory.findIndex(e => e.id === currentEditId);
                 if (index !== -1) {
                     if (type === 'work') {
-                        workHistory[index] = {
-                            ...workHistory[index],
-                            date: formattedDate,
-                            type: type,
-                            startTime: startTime,
-                            endTime: endTime,
-                            brutto: isNaN(brutto) ? null : brutto.toFixed(2),
-                            pause: isNaN(pause) ? null : pause.toFixed(2),
-                            netto: isNaN(netto) ? null : netto.toFixed(2),
-                            note: note
-                        };
+                        workHistory[index] = { ...workHistory[index], date: formattedDate, type: type, startTime: startTime, endTime: endTime, brutto: isNaN(brutto) ? null : brutto.toFixed(2), pause: isNaN(pause) ? null : pause.toFixed(2), netto: isNaN(netto) ? null : netto.toFixed(2), note: note };
                     } else {
-                        workHistory[index] = {
-                            ...workHistory[index],
-                            date: formattedDate,
-                            type: type,
-                            note: note
-                        };
+                        workHistory[index] = { ...workHistory[index], date: formattedDate, type: type, note: note };
                     }
-                    localStorage.setItem('workHistory_pro_v4', JSON.stringify(workHistory));
+                    saveData();
                 }
                 
                 document.getElementById('editModal').style.display = 'none';
@@ -823,133 +651,10 @@
                 updateAll();
             }
             
-            function updateMonthDays() {
-                const container = document.getElementById('monthDaysList');
-                container.innerHTML = '';
-                const now = new Date();
-                const currentYear = now.getFullYear();
-                const currentMonth = now.getMonth();
-                const daysInMonth = new Date(currentYear, currentMonth + 1, 0).getDate();
-                
-                const dayData = {};
-                for (const entry of workHistory) {
-                    const entryDate = parseDEDateString(entry.date);
-                    if (entryDate.getFullYear() === currentYear && entryDate.getMonth() === currentMonth) {
-                        const day = entryDate.getDate();
-                        if (!dayData[day]) dayData[day] = { work: 0, types: [] };
-                        if (entry.type === 'work') dayData[day].work += parseFloat(entry.netto) || 0;
-                        dayData[day].types.push(entry.type);
-                    }
-                }
-                
-                const typeIcons = { vacation: '🏖', sick: '🤒', holiday: '🎉', absent: '❌', work: '💼' };
-                
-                for (let day = 1; day <= daysInMonth; day++) {
-                    const data = dayData[day];
-                    const types = data ? data.types.map(t => typeIcons[t] || '').join(' ') : '';
-                    const hours = data ? data.work.toFixed(2) : '0';
-                    const dayDiv = document.createElement('div');
-                    dayDiv.style.cssText = 'display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid #eee;';
-                    dayDiv.innerHTML = `<span>${day.toString().padStart(2, '0')}.${(currentMonth+1).toString().padStart(2, '0')}.${currentYear}</span><span>${types} ${hours !== '0' ? hours + ' h' : ''}</span>`;
-                    container.appendChild(dayDiv);
-                }
-            }
-            
             function updateAll() {
                 updateStats();
                 updateHistory();
-                updateMonthDays();
-            }
-            
-            // ==================== KOMPLETTER MANUELLER EINTRAG ====================
-            function calculateNetto() {
-                const brutto = parseFloat(document.getElementById('manualBrutto').value);
-                let pause = parseFloat(document.getElementById('manualPause').value);
-                
-                if (!isNaN(brutto)) {
-                    if (isNaN(pause)) {
-                        pause = calculateAutoPause(brutto);
-                        document.getElementById('manualPause').value = pause.toFixed(2);
-                    }
-                    const netto = Math.max(0, brutto - pause);
-                    document.getElementById('manualNetto').value = netto.toFixed(2);
-                } else {
-                    document.getElementById('manualNetto').value = '';
-                }
-            }
-            
-            function saveManualEntry() {
-                let dateValue = document.getElementById('manualDate').value;
-                const type = document.getElementById('manualType').value;
-                const startTime = document.getElementById('manualStart').value;
-                const endTime = document.getElementById('manualEnd').value;
-                let brutto = parseFloat(document.getElementById('manualBrutto').value);
-                let pause = parseFloat(document.getElementById('manualPause').value);
-                let netto = parseFloat(document.getElementById('manualNetto').value);
-                const note = document.getElementById('manualNote').value;
-                
-                if (!dateValue) {
-                    const d = new Date();
-                    dateValue = d.toISOString().slice(0, 10);
-                }
-                const parts = dateValue.split('-');
-                const formattedDate = `${parts[2]}.${parts[1]}.${parts[0]}`;
-                
-                let entry;
-                if (type === 'work') {
-                    if (isNaN(brutto)) {
-                        alert('Bitte Brutto-Stunden eingeben!');
-                        return;
-                    }
-                    if (isNaN(pause)) pause = calculateAutoPause(brutto);
-                    if (isNaN(netto)) netto = Math.max(0, brutto - pause);
-                    
-                    entry = {
-                        id: Date.now(),
-                        date: formattedDate,
-                        type: type,
-                        startTime: startTime,
-                        endTime: endTime,
-                        brutto: brutto.toFixed(2),
-                        pause: pause.toFixed(2),
-                        netto: netto.toFixed(2),
-                        note: note || ''
-                    };
-                } else {
-                    entry = {
-                        id: Date.now(),
-                        date: formattedDate,
-                        type: type,
-                        startTime: '-',
-                        endTime: '-',
-                        note: note || ''
-                    };
-                }
-                
-                workHistory.push(entry);
-                localStorage.setItem('workHistory_pro_v4', JSON.stringify(workHistory));
-                updateAll();
-                
-                // Formular leeren
-                document.getElementById('manualDate').value = '';
-                document.getElementById('manualStart').value = '08:00';
-                document.getElementById('manualEnd').value = '17:00';
-                document.getElementById('manualBrutto').value = '';
-                document.getElementById('manualPause').value = '';
-                document.getElementById('manualNetto').value = '';
-                document.getElementById('manualNote').value = '';
-                
-                alert('Eintrag gespeichert!');
-            }
-            
-            function clearManualForm() {
-                document.getElementById('manualDate').value = '';
-                document.getElementById('manualStart').value = '08:00';
-                document.getElementById('manualEnd').value = '17:00';
-                document.getElementById('manualBrutto').value = '';
-                document.getElementById('manualPause').value = '';
-                document.getElementById('manualNetto').value = '';
-                document.getElementById('manualNote').value = '';
+                renderCalendar();
             }
             
             // ==================== ARBEITSZEIT FUNKTIONEN ====================
@@ -988,7 +693,7 @@
                     if (pauseInterval) clearInterval(pauseInterval);
                     pauseInterval = setInterval(() => {
                         if (isOnPause && pauseStartTime) {
-                            document.getElementById('pauseTimer').textContent = formatTime(new Date() - pauseStartTime);
+                            document.getElementById('pauseTimer').textContent = formatTimeFromSeconds(Math.floor((new Date() - pauseStartTime) / 1000));
                         }
                         updateTimeDisplay();
                     }, 1000);
@@ -1040,7 +745,7 @@
                 };
                 
                 workHistory.push(entry);
-                localStorage.setItem('workHistory_pro_v4', JSON.stringify(workHistory));
+                saveData();
                 
                 isWorking = false;
                 isOnPause = false;
@@ -1102,18 +807,172 @@
             function addAbsence(type, displayName) {
                 const note = prompt(`Notiz für ${displayName}:`, '');
                 if (note !== null && note.length <= 100) {
-                    const entry = {
-                        id: Date.now(),
-                        date: getTodayKey(),
-                        type: type,
-                        startTime: '-',
-                        endTime: '-',
-                        note: note || ''
-                    };
+                    const entry = { id: Date.now(), date: getTodayKey(), type: type, startTime: '-', endTime: '-', note: note || '' };
                     workHistory.push(entry);
-                    localStorage.setItem('workHistory_pro_v4', JSON.stringify(workHistory));
+                    saveData();
                     updateAll();
                     alert(`${displayName} wurde erfasst!`);
+                }
+            }
+            
+            // ==================== MANUELLER EINTRAG ====================
+            function calculateNetto() {
+                const brutto = parseFloat(document.getElementById('manualBrutto').value);
+                let pause = parseFloat(document.getElementById('manualPause').value);
+                if (!isNaN(brutto)) {
+                    if (isNaN(pause)) { pause = calculateAutoPause(brutto); document.getElementById('manualPause').value = pause.toFixed(2); }
+                    document.getElementById('manualNetto').value = Math.max(0, brutto - pause).toFixed(2);
+                }
+            }
+            
+            function saveManualEntry() {
+                let dateValue = document.getElementById('manualDate').value;
+                const type = document.getElementById('manualType').value;
+                const startTime = document.getElementById('manualStart').value;
+                const endTime = document.getElementById('manualEnd').value;
+                let brutto = parseFloat(document.getElementById('manualBrutto').value);
+                let pause = parseFloat(document.getElementById('manualPause').value);
+                let netto = parseFloat(document.getElementById('manualNetto').value);
+                const note = document.getElementById('manualNote').value;
+                
+                if (!dateValue) { const d = new Date(); dateValue = d.toISOString().slice(0, 10); }
+                const parts = dateValue.split('-');
+                const formattedDate = `${parts[2]}.${parts[1]}.${parts[0]}`;
+                
+                let entry;
+                if (type === 'work') {
+                    if (isNaN(brutto)) { alert('Bitte Brutto-Stunden eingeben!'); return; }
+                    if (isNaN(pause)) pause = calculateAutoPause(brutto);
+                    if (isNaN(netto)) netto = Math.max(0, brutto - pause);
+                    entry = { id: Date.now(), date: formattedDate, type: type, startTime: startTime || '08:00:00', endTime: endTime || '17:00:00', brutto: brutto.toFixed(2), pause: pause.toFixed(2), netto: netto.toFixed(2), note: note || '' };
+                } else {
+                    entry = { id: Date.now(), date: formattedDate, type: type, startTime: '-', endTime: '-', note: note || '' };
+                }
+                
+                workHistory.push(entry);
+                saveData();
+                updateAll();
+                
+                document.getElementById('manualDate').value = '';
+                document.getElementById('manualStart').value = '08:00:00';
+                document.getElementById('manualEnd').value = '17:00:00';
+                document.getElementById('manualBrutto').value = '';
+                document.getElementById('manualPause').value = '';
+                document.getElementById('manualNetto').value = '';
+                document.getElementById('manualNote').value = '';
+                alert('Eintrag gespeichert!');
+            }
+            
+            function clearManualForm() {
+                document.getElementById('manualDate').value = '';
+                document.getElementById('manualStart').value = '08:00:00';
+                document.getElementById('manualEnd').value = '17:00:00';
+                document.getElementById('manualBrutto').value = '';
+                document.getElementById('manualPause').value = '';
+                document.getElementById('manualNetto').value = '';
+                document.getElementById('manualNote').value = '';
+            }
+            
+            // ==================== BACKUP FUNKTIONEN ====================
+            function createBackup() {
+                const backup = { version: APP_VERSION, exportDate: new Date().toISOString(), workHistory: workHistory, settings: { autoPauseMode: autoPauseMode, currentFormula: currentFormula } };
+                const blob = new Blob([JSON.stringify(backup, null, 2)], { type: 'application/json' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `arbeitszeiten_backup_${new Date().toISOString().split('T')[0]}.json`;
+                a.click();
+                URL.revokeObjectURL(url);
+                alert('Backup wurde erstellt!');
+            }
+            
+            function restoreBackup() {
+                const input = document.createElement('input');
+                input.type = 'file';
+                input.accept = '.json';
+                input.onchange = e => {
+                    const file = e.target.files[0];
+                    const reader = new FileReader();
+                    reader.onload = event => {
+                        try {
+                            const data = JSON.parse(event.target.result);
+                            if (data.workHistory && Array.isArray(data.workHistory)) {
+                                if (confirm('Möchten Sie Ihre aktuellen Daten mit dem Backup ersetzen?')) {
+                                    workHistory = data.workHistory;
+                                    if (data.settings) {
+                                        if (data.settings.autoPauseMode !== undefined) autoPauseMode = data.settings.autoPauseMode;
+                                        if (data.settings.currentFormula) currentFormula = data.settings.currentFormula;
+                                    }
+                                    saveData();
+                                    updateAll();
+                                    alert('Backup erfolgreich wiederhergestellt!');
+                                }
+                            } else { alert('Ungültige Backup-Datei!'); }
+                        } catch (error) { alert('Fehler beim Lesen der Backup-Datei!'); }
+                    };
+                    reader.readAsText(file);
+                };
+                input.click();
+            }
+            
+            function exportData() {
+                const data = { exportDate: new Date().toISOString(), workHistory: workHistory, settings: { autoPauseMode: autoPauseMode, currentFormula: currentFormula } };
+                const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `arbeitszeiten_export_${new Date().toISOString().split('T')[0]}.json`;
+                a.click();
+                URL.revokeObjectURL(url);
+                alert('Daten exportiert!');
+            }
+            
+            function importData() {
+                const input = document.createElement('input');
+                input.type = 'file';
+                input.accept = '.json';
+                input.onchange = e => {
+                    const file = e.target.files[0];
+                    const reader = new FileReader();
+                    reader.onload = event => {
+                        try {
+                            const data = JSON.parse(event.target.result);
+                            if (data.workHistory && Array.isArray(data.workHistory)) {
+                                if (confirm('Importierte Daten zu bestehenden HINZUFÜGEN? (OK = hinzufügen, Abbrechen = ersetzen)')) {
+                                    workHistory = [...workHistory, ...data.workHistory];
+                                } else if (confirm('Bestehende Daten ERSETZEN?')) {
+                                    workHistory = data.workHistory;
+                                }
+                                if (data.settings) {
+                                    if (data.settings.autoPauseMode !== undefined) autoPauseMode = data.settings.autoPauseMode;
+                                    if (data.settings.currentFormula) currentFormula = data.settings.currentFormula;
+                                }
+                                saveData();
+                                updateAll();
+                                alert('Daten importiert!');
+                            } else { alert('Ungültige Datei!'); }
+                        } catch (error) { alert('Fehler beim Import!'); }
+                    };
+                    reader.readAsText(file);
+                };
+                input.click();
+            }
+            
+            function shareLink() {
+                const url = window.location.href;
+                if (navigator.share) { navigator.share({ title: 'Arbeitszeiterfassung Pro', text: 'Meine Arbeitszeiten-App', url: url }); }
+                else { navigator.clipboard.writeText(url); alert('Link in Zwischenablage kopiert!'); }
+            }
+            
+            function yearlyCleanup() {
+                if (confirm('⚠️ ACHTUNG! Dieser Vorgang löscht alle Einträge, die älter als 1 Jahr sind. Fortfahren?')) {
+                    const oneYearAgo = new Date();
+                    oneYearAgo.setFullYear(oneYearAgo.getFullYear() - 1);
+                    const beforeCount = workHistory.length;
+                    workHistory = workHistory.filter(entry => { const entryDate = parseDEDateString(entry.date); return entryDate >= oneYearAgo; });
+                    saveData();
+                    updateAll();
+                    alert(`✅ Cleanup abgeschlossen! ${beforeCount - workHistory.length} alte Einträge wurden gelöscht.`);
                 }
             }
             
@@ -1152,8 +1011,17 @@
             document.getElementById('clearManualFormBtn').addEventListener('click', clearManualForm);
             document.getElementById('saveEditBtn').addEventListener('click', saveEdit);
             document.getElementById('closeModalBtn').addEventListener('click', () => { document.getElementById('editModal').style.display = 'none'; currentEditId = null; });
+            document.getElementById('backupBtn').addEventListener('click', createBackup);
+            document.getElementById('restoreBackupBtn').addEventListener('click', restoreBackup);
+            document.getElementById('exportDataBtn').addEventListener('click', exportData);
+            document.getElementById('importDataBtn').addEventListener('click', importData);
+            document.getElementById('shareLinkBtn').addEventListener('click', shareLink);
+            document.getElementById('yearlyCleanupBtn').addEventListener('click', yearlyCleanup);
+            document.getElementById('prevMonthBtn').addEventListener('click', prevMonth);
+            document.getElementById('nextMonthBtn').addEventListener('click', nextMonth);
+            document.getElementById('todayMonthBtn').addEventListener('click', todayMonth);
             
-            // ==================== WIEDERHERSTELLUNG ====================
+            // ==================== WIEDERHERSTELLUNG NACH RELOAD ====================
             const savedWorkStart = localStorage.getItem('activeWorkStart');
             const savedIsWorking = localStorage.getItem('isWorking') === 'true';
             const savedPauseStart = localStorage.getItem('pauseStartTime');
@@ -1169,7 +1037,7 @@
                     document.getElementById('pauseTimerDisplay').style.display = 'block';
                     document.getElementById('pauseBtn').disabled = true;
                     pauseInterval = setInterval(() => {
-                        if (isOnPause && pauseStartTime) document.getElementById('pauseTimer').textContent = formatTime(new Date() - pauseStartTime);
+                        if (isOnPause && pauseStartTime) document.getElementById('pauseTimer').textContent = formatTimeFromSeconds(Math.floor((new Date() - pauseStartTime) / 1000));
                         updateTimeDisplay();
                     }, 1000);
                 } else {
@@ -1184,9 +1052,11 @@
             }
             
             // ==================== INIT ====================
+            loadData();
             setInterval(updateCurrentTime, 1000);
             updateCurrentTime();
             updateAll();
+            document.getElementById('versionBadge').innerHTML = `v${APP_VERSION}`;
         })();
     </script>
 </body>
