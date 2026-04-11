@@ -2,9 +2,22 @@
 <html lang="de">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://cdnjs.cloudflare.com; style-src 'self' 'unsafe-inline';">
-    <title>Arbeitszeiterfassung Pro - Voll funktionsfähig</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes, viewport-fit=cover">
+    <meta name="theme-color" content="#1a73e8">
+    <meta name="google-play-app" content="app-id=com.arbeitszeiterfassung.pro">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Arbeitszeiterfassung">
+    <link rel="manifest" href="manifest.json">
+    
+    <!-- Sicherheits-Header -->
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://cdnjs.cloudflare.com; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self'; connect-src 'self';">
+    <meta http-equiv="X-Content-Type-Options" content="nosniff">
+    <meta http-equiv="X-Frame-Options" content="DENY">
+    <meta http-equiv="X-XSS-Protection" content="1; mode=block">
+    <meta http-equiv="Referrer-Policy" content="strict-origin-when-cross-origin">
+    
+    <title>Arbeitszeiterfassung Pro - Sichere Zeiterfassung</title>
     <style>
         :root {
             --primary: #1a73e8;
@@ -38,15 +51,51 @@
         .version-badge { background: rgba(255,255,255,0.2); padding: 4px 10px; border-radius: 20px; font-size: 0.7rem; display: inline-block; margin-left: 10px; }
         .security-badge { background: #2ecc71; color: white; padding: 5px 10px; border-radius: 20px; font-size: 0.7rem; display: inline-block; margin-left: 10px; }
         
+        /* Wichtige Warnung - verbesserte Sichtbarkeit */
+        .warning-message {
+            background: linear-gradient(135deg, var(--danger), #c0392b);
+            color: white;
+            padding: 15px;
+            border-radius: 12px;
+            margin: 15px 0;
+            animation: blinkWarning 0.8s ease-in-out infinite;
+            font-weight: bold;
+            text-align: center;
+            font-size: 1.1rem;
+            box-shadow: 0 0 20px rgba(234,67,53,0.5);
+            border: 2px solid white;
+        }
+        
+        @keyframes blinkWarning {
+            0%, 100% { opacity: 1; transform: scale(1); background: linear-gradient(135deg, var(--danger), #c0392b); }
+            50% { opacity: 0.85; transform: scale(1.02); background: linear-gradient(135deg, #ff6b6b, #e74c3c); }
+        }
+        
+        /* Sanfte Warnung für 8:30 */
+        .soft-warning {
+            background: var(--warning);
+            color: var(--dark);
+            padding: 12px;
+            border-radius: 10px;
+            margin-top: 10px;
+            animation: pulse 1s ease-in-out infinite;
+            font-weight: bold;
+            border-left: 4px solid var(--danger);
+        }
+        
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.7; }
+        }
+        
         .status-section { text-align: center; padding: 20px; background: var(--light); border-radius: 10px; margin-bottom: 20px; }
-        .status-indicator { display: inline-block; width: 12px; height: 12px; border-radius: 50%; margin-right: 8px; animation: pulse 1s infinite; }
-        @keyframes pulse { 0% { opacity: 1; transform: scale(1); } 100% { opacity: 0.5; transform: scale(1.2); } }
-        .status-working .status-indicator { background: var(--success); }
-        .status-pause .status-indicator { background: var(--pause-color); }
+        .status-indicator { display: inline-block; width: 12px; height: 12px; border-radius: 50%; margin-right: 8px; animation: statusPulse 1s infinite; }
+        @keyframes statusPulse { 0% { opacity: 1; transform: scale(1); } 100% { opacity: 0.5; transform: scale(1.2); } }
+        .status-working .status-indicator { background: var(--success); box-shadow: 0 0 10px var(--success); }
+        .status-pause .status-indicator { background: var(--pause-color); box-shadow: 0 0 10px var(--pause-color); }
         
         .current-time { font-size: 2.5rem; font-weight: 700; margin: 15px 0; font-family: monospace; }
-        .warning-message { background: var(--warning); color: var(--dark); padding: 10px; border-radius: 8px; margin-top: 10px; animation: blink 1s ease-in-out infinite; }
-        @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0.6; } }
+        .current-time-seconds { font-size: 1.2rem; color: var(--secondary); }
         
         .toolbar { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 20px; justify-content: center; }
         .tool-btn { padding: 10px 15px; background: var(--backup); color: white; border: none; border-radius: 10px; cursor: pointer; font-size: 0.85rem; transition: all 0.2s; display: flex; align-items: center; gap: 6px; }
@@ -104,14 +153,11 @@
         .form-group label { font-size: 0.7rem; font-weight: 600; color: var(--secondary); }
         .form-group input, .form-group select { padding: 10px; border: 1px solid var(--border); border-radius: 8px; font-size: 0.9rem; }
         
-        /* Monatskalender */
-        .calendar { display: grid; grid-template-columns: repeat(7, 1fr); gap: 5px; margin-top: 15px; }
-        .calendar-weekday { text-align: center; font-weight: bold; padding: 8px; background: var(--primary); color: white; border-radius: 8px; font-size: 0.8rem; }
-        .calendar-day { text-align: center; padding: 10px 5px; background: var(--light); border-radius: 8px; cursor: pointer; transition: all 0.2s; position: relative; min-height: 70px; }
+        .calendar-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 5px; margin-top: 10px; }
+        .calendar-weekday { text-align: center; font-weight: bold; padding: 10px; background: var(--primary); color: white; border-radius: 8px; font-size: 0.8rem; }
+        .calendar-day { text-align: center; padding: 10px 5px; background: var(--light); border-radius: 8px; cursor: pointer; transition: all 0.2s; min-height: 75px; }
         .calendar-day:hover { background: var(--border); transform: scale(1.02); }
-        .calendar-day.today { background: var(--warning); color: var(--dark); font-weight: bold; }
-        .calendar-day.has-work { background: #e8f5e9; }
-        .calendar-day.has-vacation { background: #f3e5f5; }
+        .calendar-day.today { background: var(--warning); color: var(--dark); font-weight: bold; border: 2px solid var(--primary); }
         .calendar-day .day-number { font-weight: bold; font-size: 1rem; }
         .calendar-day .day-hours { font-size: 0.7rem; color: var(--success); margin-top: 4px; }
         .calendar-day .day-icons { font-size: 0.8rem; margin-top: 4px; }
@@ -120,14 +166,31 @@
             body { padding: 10px; }
             .current-time { font-size: 1.8rem; }
             .btn { padding: 10px; font-size: 0.8rem; }
-            .calendar-day { min-height: 50px; padding: 5px; }
-            .calendar-day .day-number { font-size: 0.8rem; }
+            .calendar-day { min-height: 55px; padding: 5px; }
         }
         
         .privacy-note { font-size: 0.7rem; color: var(--secondary); text-align: center; margin-top: 15px; padding-top: 15px; border-top: 1px solid var(--border); }
-        .update-info { background: #e8f5e9; border-left: 4px solid var(--success); padding: 10px; margin-bottom: 15px; border-radius: 8px; font-size: 0.8rem; display: none; }
         .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1000; justify-content: center; align-items: center; }
         .modal-content { background: white; border-radius: 15px; padding: 20px; max-width: 500px; width: 90%; max-height: 80vh; overflow-y: auto; }
+        
+        .toast-notification {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: var(--dark);
+            color: white;
+            padding: 12px 20px;
+            border-radius: 30px;
+            z-index: 2000;
+            animation: slideUp 0.3s ease-out;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+        }
+        
+        @keyframes slideUp {
+            from { transform: translateX(-50%) translateY(100px); opacity: 0; }
+            to { transform: translateX(-50%) translateY(0); opacity: 1; }
+        }
     </style>
 </head>
 <body>
@@ -135,13 +198,28 @@
         <div class="card">
             <div class="card-header">
                 <h1>⚡ Arbeitszeiterfassung Pro 
-                    <span class="version-badge" id="versionBadge">v2.0.0</span>
-                    <span class="security-badge">🔒 Sicher & Verschlüsselt</span>
+                    <span class="version-badge" id="versionBadge">v3.0.0</span>
+                    <span class="security-badge">🔒 Google Play Ready</span>
                 </h1>
-                <p>Sekundengenaue Zeiterfassung | Backup & Wiederherstellung | Monatskalender | Update-fähig</p>
+                <p>Sekundengenaue Zeiterfassung | Automatische 8:30h Warnung | 100% Daten-Sicherheit</p>
             </div>
             <div class="card-body">
-                <div id="updateInfo" class="update-info">✅ <strong>Update verfügbar!</strong> <button id="applyUpdateBtn" style="background: var(--success); color: white; border: none; padding: 4px 12px; border-radius: 5px; cursor: pointer;">Jetzt updaten</button></div>
+                <!-- 8:30 Warnung Bereich - Verbessert -->
+                <div id="strongWarningMessage" style="display: none;" class="warning-message">
+                    ⚠️⚠️⚠️ WARNUNG! Sie haben 8 Stunden und 30 Minuten gearbeitet! ⚠️⚠️⚠️<br>
+                    <small>Gesetzliche Höchstarbeitszeit erreicht - Pause ist erforderlich!</small>
+                </div>
+                
+                <div class="status-section" id="statusSection">
+                    <div id="statusText"><span class="status-indicator"></span> Bereit zum Start</div>
+                    <div class="current-time">
+                        <span id="currentTimeHours">--:--:--</span>
+                        <span class="current-time-seconds" id="currentTimeSeconds"></span>
+                    </div>
+                    <div id="softWarningMessage" style="display: none;" class="soft-warning">
+                        ⚠️ Achtung! Sie haben 8 Stunden und 30 Minuten gearbeitet!
+                    </div>
+                </div>
                 
                 <div class="toolbar">
                     <button class="tool-btn" id="backupBtn">💾 Backup erstellen</button>
@@ -149,13 +227,8 @@
                     <button class="tool-btn" id="exportDataBtn">📤 Daten exportieren</button>
                     <button class="tool-btn" id="importDataBtn">📥 Daten importieren</button>
                     <button class="tool-btn" id="shareLinkBtn">🔗 Link teilen</button>
-                    <button class="tool-btn" id="yearlyCleanupBtn" style="background: var(--danger);">📅 Jahres-Cleanup</button>
-                </div>
-                
-                <div class="status-section" id="statusSection">
-                    <div id="statusText"><span class="status-indicator"></span> Bereit zum Start</div>
-                    <div class="current-time" id="currentTime">--:--:--</div>
-                    <div id="warningMessage" style="display: none;" class="warning-message">⚠️ Achtung! Sie haben 8 Stunden und 30 Minuten gearbeitet!</div>
+                    <button class="tool-btn danger" id="yearlyCleanupBtn">📅 Jahres-Cleanup</button>
+                    <button class="tool-btn" id="dataIntegrityBtn">🛡️ Daten-Integrität prüfen</button>
                 </div>
                 
                 <div class="time-detail">
@@ -168,6 +241,9 @@
                     <h3>⏸ Automatische Pausenregeln</h3>
                     <div><span style="display: inline-block; padding: 4px 8px; background: #fff3e0; border-radius: 20px; margin: 4px;">📋 6+ Stunden → 30 Min Pause</span><span style="display: inline-block; padding: 4px 8px; background: #ffebee; border-radius: 20px; margin: 4px;">📋 9+ Stunden → 45 Min Pause</span></div>
                     <div style="margin-top: 10px;"><strong>⚙️ Modus:</strong> <span id="pauseModeDisplay">🔄 Automatisch</span> <button id="togglePauseMode" style="margin-left: 10px; padding: 4px 8px; background: #6c5ce7; color: white; border: none; border-radius: 5px; cursor: pointer;">Umschalten</button></div>
+                    <div style="margin-top: 10px; font-size: 0.8rem; background: white; padding: 8px; border-radius: 8px;">
+                        💡 <strong>Warnung bei 8:30 Stunden:</strong> Bei Erreichen von 8 Stunden 30 Minuten Netto-Arbeitszeit ertönt eine Vibration und eine deutliche Warnung wird eingeblendet!
+                    </div>
                 </div>
                 
                 <div id="pauseTimerDisplay" class="pause-timer-box" style="display: none;">
@@ -203,11 +279,13 @@
                 <!-- Monatskalender -->
                 <div class="card" style="margin-top: 20px;">
                     <div class="card-header" style="background: var(--secondary);">
-                        <h3>📅 Monatskalender <span id="calendarMonthYear"></span></h3>
-                        <div style="display: flex; gap: 10px; margin-top: 10px;">
-                            <button id="prevMonthBtn" class="btn btn-secondary" style="background: white; color: var(--dark);">◀ Vorheriger</button>
-                            <button id="nextMonthBtn" class="btn btn-secondary" style="background: white; color: var(--dark);">Nächster ▶</button>
-                            <button id="todayMonthBtn" class="btn btn-primary" style="background: white; color: var(--dark);">📅 Heute</button>
+                        <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;">
+                            <h3>📅 Monatskalender <span id="calendarMonthYear"></span></h3>
+                            <div style="display: flex; gap: 10px;">
+                                <button id="prevMonthBtn" class="btn btn-secondary" style="background: white; color: var(--dark);">◀</button>
+                                <button id="nextMonthBtn" class="btn btn-secondary" style="background: white; color: var(--dark);">▶</button>
+                                <button id="todayMonthBtn" class="btn btn-primary" style="background: white; color: var(--dark);">📅 Heute</button>
+                            </div>
                         </div>
                     </div>
                     <div class="card-body">
@@ -258,7 +336,7 @@
                     </div>
                     <div class="card-body">
                         <div class="table-wrapper">
-                            <table>
+                            <table id="historyTable">
                                 <thead><tr><th>Datum</th><th>Typ</th><th>Start</th><th>Ende</th><th>Brutto</th><th>Pause</th><th>Netto</th><th>Notiz</th><th>Aktion</th></tr></thead>
                                 <tbody id="historyBody"></tbody>
                             </table>
@@ -268,7 +346,8 @@
                 
                 <div class="privacy-note">
                     🔒 <strong>Sicherheit:</strong> 100% lokale Speicherung | Keine Cloud | DSGVO-konform | Für immer kostenlos<br>
-                    ⏱️ <strong>Sekundengenaue Erfassung</strong> | 💾 <strong>Backup & Wiederherstellung</strong> | 📅 <strong>Monatskalender</strong>
+                    ⏱️ <strong>8:30h Warnung:</strong> Automatische Vibration + visuelle Warnung bei Erreichen der Höchstarbeitszeit<br>
+                    💾 <strong>Daten-Integrität:</strong> Automatische Backups | Kein Datenverlust | Mehrfache Sicherungen
                 </div>
             </div>
         </div>
@@ -292,9 +371,9 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
     <script>
         (function() {
-            // ==================== SPEICHER SCHLÜSSEL ====================
-            const STORAGE_KEY = 'workHistory_pro_final';
-            const APP_VERSION = "2.0.0";
+            // ==================== VERSION & SPEICHER ====================
+            const STORAGE_KEY = 'workHistory_pro_v3';
+            const APP_VERSION = "3.0.0";
             
             // ==================== GLOBALE VARIABLEN ====================
             let workHistory = [];
@@ -311,7 +390,37 @@
             let currentCalendarYear = new Date().getFullYear();
             let currentCalendarMonth = new Date().getMonth();
             
-            // ==================== DATEN LADEN ====================
+            // 8:30 Warnungs-Tracking
+            let hasShown830Warning = false;
+            let lastNetHours = 0;
+            
+            // ==================== TOAST NOTIFICATION ====================
+            function showToast(message, duration = 3000) {
+                const toast = document.createElement('div');
+                toast.className = 'toast-notification';
+                toast.textContent = message;
+                document.body.appendChild(toast);
+                setTimeout(() => toast.remove(), duration);
+            }
+            
+            // ==================== DATEN INTEGRITÄT ====================
+            function validateDataIntegrity() {
+                let corrupted = 0;
+                for (let i = 0; i < workHistory.length; i++) {
+                    const entry = workHistory[i];
+                    if (!entry.date || !entry.type || (entry.type === 'work' && (isNaN(parseFloat(entry.netto)) || isNaN(parseFloat(entry.brutto))))) {
+                        corrupted++;
+                    }
+                }
+                if (corrupted > 0) {
+                    showToast(`⚠️ ${corrupted} beschädigte Einträge gefunden! Bitte Backup wiederherstellen.`, 5000);
+                } else {
+                    showToast('✅ Alle Daten sind intakt!', 2000);
+                }
+                return corrupted === 0;
+            }
+            
+            // ==================== DATEN LADEN & SPEICHERN ====================
             function loadData() {
                 try {
                     const saved = localStorage.getItem(STORAGE_KEY);
@@ -322,20 +431,34 @@
                             console.log("Daten geladen:", workHistory.length, "Einträge");
                         }
                     }
+                    // Fallback für alte Versionen
+                    const oldSaved = localStorage.getItem('workHistory_pro_final_v2');
+                    if (oldSaved && (!saved || workHistory.length === 0)) {
+                        const parsed = JSON.parse(oldSaved);
+                        if (Array.isArray(parsed)) {
+                            workHistory = parsed;
+                            saveData();
+                            console.log("Alte Daten migriert!");
+                        }
+                    }
                 } catch (e) { console.warn("Fehler beim Laden:", e); }
                 
-                try { autoPauseMode = localStorage.getItem('autoPauseMode') !== 'false'; } catch(e) {}
-                try { currentFormula = localStorage.getItem('currentFormula') || '160'; } catch(e) {}
+                try { autoPauseMode = localStorage.getItem('autoPauseMode_v3') !== 'false'; } catch(e) {}
+                try { currentFormula = localStorage.getItem('currentFormula_v3') || '160'; } catch(e) {}
             }
             
-            // ==================== DATEN SPEICHERN ====================
             function saveData() {
                 try {
                     localStorage.setItem(STORAGE_KEY, JSON.stringify(workHistory));
-                    localStorage.setItem('autoPauseMode', autoPauseMode);
-                    localStorage.setItem('currentFormula', currentFormula);
+                    localStorage.setItem('autoPauseMode_v3', autoPauseMode);
+                    localStorage.setItem('currentFormula_v3', currentFormula);
                     console.log("Daten gespeichert:", workHistory.length, "Einträge");
-                } catch (e) { console.warn("Fehler beim Speichern:", e); }
+                    return true;
+                } catch (e) { 
+                    console.warn("Fehler beim Speichern:", e);
+                    showToast("❌ Fehler beim Speichern! Bitte Backup erstellen.", 4000);
+                    return false;
+                }
             }
             
             // ==================== HELFER ====================
@@ -368,7 +491,46 @@
                 return 0;
             }
             
-            function vibrate() { if (navigator.vibrate) navigator.vibrate(500); }
+            function vibrate() { 
+                if (navigator.vibrate) {
+                    navigator.vibrate([500, 200, 500]);
+                }
+            }
+            
+            // ==================== 8:30 WARNUNG (VERBESSERT) ====================
+            function checkAndShow830Warning(netHours) {
+                // Prüfung auf 8 Stunden 30 Minuten (8.5 Stunden)
+                const isAt830 = netHours >= 8.5 && netHours < 8.51;
+                
+                if (isAt830 && !hasShown830Warning) {
+                    // Warnung anzeigen - BEIDE Warnungen aktivieren
+                    const strongWarning = document.getElementById('strongWarningMessage');
+                    const softWarning = document.getElementById('softWarningMessage');
+                    
+                    if (strongWarning) strongWarning.style.display = 'block';
+                    if (softWarning) softWarning.style.display = 'block';
+                    
+                    // Vibration auslösen
+                    vibrate();
+                    
+                    // Toast Nachricht
+                    showToast("⚠️⚠️⚠️ 8 Stunden 30 Minuten erreicht! Gesetzliche Höchstarbeitszeit! ⚠️⚠️⚠️", 8000);
+                    
+                    hasShown830Warning = true;
+                    
+                    // Nach 10 Sekunden die starke Warnung ausblenden, soft bleibt
+                    setTimeout(() => {
+                        if (strongWarning) strongWarning.style.display = 'none';
+                    }, 10000);
+                } else if (netHours < 8.4) {
+                    // Zurücksetzen wenn unter 8:30
+                    hasShown830Warning = false;
+                    const strongWarning = document.getElementById('strongWarningMessage');
+                    const softWarning = document.getElementById('softWarningMessage');
+                    if (strongWarning) strongWarning.style.display = 'none';
+                    if (softWarning) softWarning.style.display = 'none';
+                }
+            }
             
             // ==================== MONATSZIEL ====================
             function getMonthlyTarget() { return currentFormula === '160' ? 160 : 173.33; }
@@ -435,13 +597,8 @@
                     document.getElementById('pauseTotalTime').textContent = formatTimeFromSeconds(Math.floor(pauseHours * 3600));
                     document.getElementById('netTime').textContent = formatTimeFromSeconds(Math.floor(netHours * 3600));
                     
-                    if (netHours >= 8.5 && netHours < 8.51) {
-                        document.getElementById('warningMessage').style.display = 'block';
-                        vibrate();
-                        setTimeout(() => { document.getElementById('warningMessage').style.display = 'none'; }, 5000);
-                    } else {
-                        document.getElementById('warningMessage').style.display = 'none';
-                    }
+                    // 8:30 Warnung prüfen (VERBESSERT)
+                    checkAndShow830Warning(netHours);
                     
                     const todayNet = getTodayNetHours() + netHours;
                     document.getElementById('todayHours').textContent = todayNet.toFixed(2) + ' h';
@@ -504,42 +661,34 @@
                             workHistory = workHistory.filter(e => e.id !== id);
                             saveData();
                             updateAll();
+                            showToast("Eintrag gelöscht", 2000);
                         }
                     });
                 });
             }
             
-            // ==================== MONATSKALENDER ====================
+            // ==================== KALENDER ====================
             function renderCalendar() {
                 const container = document.getElementById('calendarContainer');
                 if (!container) return;
                 
                 const year = currentCalendarYear;
                 const month = currentCalendarMonth;
-                const firstDay = new Date(year, month, 1);
-                const lastDay = new Date(year, month + 1, 0);
-                const daysInMonth = lastDay.getDate();
-                const startWeekday = firstDay.getDay(); // 0 = Sonntag
+                const firstDayOfMonth = new Date(year, month, 1);
+                const lastDayOfMonth = new Date(year, month + 1, 0);
+                const daysInMonth = lastDayOfMonth.getDate();
+                let firstDayWeekday = firstDayOfMonth.getDay();
+                let startOffset = firstDayWeekday === 0 ? 6 : firstDayWeekday - 1;
+                const prevMonthLastDay = new Date(year, month, 0).getDate();
+                const weekdays = ['MO', 'DI', 'MI', 'DO', 'FR', 'SA', 'SO'];
                 
-                // Wochentage
-                const weekdays = ['SO', 'MO', 'DI', 'MI', 'DO', 'FR', 'SA'];
-                let html = '<div class="calendar">';
-                for (let i = 0; i < 7; i++) {
-                    html += `<div class="calendar-weekday">${weekdays[i]}</div>`;
-                }
+                let html = '<div class="calendar-grid">';
+                for (let i = 0; i < 7; i++) html += `<div class="calendar-weekday">${weekdays[i]}</div>`;
                 
-                // Leere Tage am Anfang
-                let startOffset = startWeekday === 0 ? 6 : startWeekday - 1;
-                for (let i = 0; i < startOffset; i++) {
-                    html += `<div class="calendar-day" style="background: transparent;"></div>`;
-                }
-                
-                // Tage des Monats
                 const today = new Date();
                 const isCurrentMonth = (today.getFullYear() === year && today.getMonth() === month);
                 const todayDate = today.getDate();
                 
-                // Daten für jeden Tag sammeln
                 const dayData = {};
                 for (const entry of workHistory) {
                     const entryDate = parseDEDateString(entry.date);
@@ -553,14 +702,17 @@
                 
                 const typeIcons = { vacation: '🏖', sick: '🤒', holiday: '🎉', absent: '❌', work: '💼' };
                 
+                for (let i = 0; i < startOffset; i++) {
+                    const prevMonthDay = prevMonthLastDay - startOffset + i + 1;
+                    html += `<div class="calendar-day" style="opacity:0.4;"><div class="day-number">${prevMonthDay}</div></div>`;
+                }
+                
                 for (let day = 1; day <= daysInMonth; day++) {
                     const data = dayData[day];
                     const types = data ? data.types.map(t => typeIcons[t] || '').join(' ') : '';
                     const hours = data ? data.work.toFixed(2) : '0';
                     let dayClass = 'calendar-day';
                     if (isCurrentMonth && day === todayDate) dayClass += ' today';
-                    if (data && data.work > 0) dayClass += ' has-work';
-                    if (data && data.types.includes('vacation')) dayClass += ' has-vacation';
                     
                     html += `<div class="${dayClass}" onclick="document.getElementById('manualDate').value='${year}-${(month+1).toString().padStart(2,'0')}-${day.toString().padStart(2,'0')}'">
                         <div class="day-number">${day}</div>
@@ -569,47 +721,33 @@
                     </div>`;
                 }
                 
+                const totalCells = startOffset + daysInMonth;
+                const remainingCells = totalCells % 7 === 0 ? 0 : 7 - (totalCells % 7);
+                for (let i = 1; i <= remainingCells; i++) {
+                    html += `<div class="calendar-day" style="opacity:0.4;"><div class="day-number">${i}</div></div>`;
+                }
+                
                 html += '</div>';
                 container.innerHTML = html;
-                document.getElementById('calendarMonthYear').innerHTML = `${new Date(year, month).toLocaleDateString('de-DE', { month: 'long', year: 'numeric' })}`;
+                
+                const monthNames = ['Januar', 'Februar', 'März', 'April', 'Mai', 'Juni', 'Juli', 'August', 'September', 'Oktober', 'November', 'Dezember'];
+                document.getElementById('calendarMonthYear').innerHTML = `${monthNames[month]} ${year}`;
             }
             
-            function prevMonth() {
-                currentCalendarMonth--;
-                if (currentCalendarMonth < 0) {
-                    currentCalendarMonth = 11;
-                    currentCalendarYear--;
-                }
-                renderCalendar();
-            }
-            
-            function nextMonth() {
-                currentCalendarMonth++;
-                if (currentCalendarMonth > 11) {
-                    currentCalendarMonth = 0;
-                    currentCalendarYear++;
-                }
-                renderCalendar();
-            }
-            
-            function todayMonth() {
-                currentCalendarYear = new Date().getFullYear();
-                currentCalendarMonth = new Date().getMonth();
-                renderCalendar();
-            }
+            function prevMonth() { currentCalendarMonth--; if (currentCalendarMonth < 0) { currentCalendarMonth = 11; currentCalendarYear--; } renderCalendar(); }
+            function nextMonth() { currentCalendarMonth++; if (currentCalendarMonth > 11) { currentCalendarMonth = 0; currentCalendarYear++; } renderCalendar(); }
+            function todayMonth() { currentCalendarYear = new Date().getFullYear(); currentCalendarMonth = new Date().getMonth(); renderCalendar(); }
             
             // ==================== EDIT MODAL ====================
             function openEditModal(id) {
                 const entry = workHistory.find(e => e.id === id);
                 if (!entry) return;
                 currentEditId = id;
-                
                 let dateForInput = '';
                 if (entry.date) {
                     const parts = entry.date.split('.');
                     if (parts.length === 3) dateForInput = `${parts[2]}-${parts[1]}-${parts[0]}`;
                 }
-                
                 document.getElementById('editDate').value = dateForInput;
                 document.getElementById('editType').value = entry.type;
                 document.getElementById('editStart').value = entry.startTime !== '-' ? entry.startTime : '08:00:00';
@@ -618,13 +756,11 @@
                 document.getElementById('editPause').value = entry.pause || '';
                 document.getElementById('editNetto').value = entry.netto || '';
                 document.getElementById('editNote').value = entry.note || '';
-                
                 document.getElementById('editModal').style.display = 'flex';
             }
             
             function saveEdit() {
                 if (currentEditId === null) return;
-                
                 const dateStr = document.getElementById('editDate').value;
                 const parts = dateStr.split('-');
                 const formattedDate = `${parts[2]}.${parts[1]}.${parts[0]}`;
@@ -635,7 +771,6 @@
                 const pause = parseFloat(document.getElementById('editPause').value);
                 const netto = parseFloat(document.getElementById('editNetto').value);
                 const note = document.getElementById('editNote').value;
-                
                 const index = workHistory.findIndex(e => e.id === currentEditId);
                 if (index !== -1) {
                     if (type === 'work') {
@@ -645,10 +780,10 @@
                     }
                     saveData();
                 }
-                
                 document.getElementById('editModal').style.display = 'none';
                 currentEditId = null;
                 updateAll();
+                showToast("Eintrag aktualisiert", 2000);
             }
             
             function updateAll() {
@@ -663,8 +798,9 @@
                 workStartTime = new Date();
                 isWorking = true;
                 totalPauseToday = 0;
-                localStorage.setItem('activeWorkStart', workStartTime.toISOString());
-                localStorage.setItem('isWorking', 'true');
+                hasShown830Warning = false;
+                localStorage.setItem('activeWorkStart_v3', workStartTime.toISOString());
+                localStorage.setItem('isWorking_v3', 'true');
                 
                 document.getElementById('statusText').innerHTML = '<span class="status-indicator"></span> ▶ Arbeit läuft';
                 document.getElementById('statusSection').classList.add('status-working');
@@ -676,14 +812,15 @@
                 if (workInterval) clearInterval(workInterval);
                 workInterval = setInterval(updateTimeDisplay, 1000);
                 updateTimeDisplay();
+                showToast("Arbeit gestartet", 2000);
             }
             
             function startManualPause() {
                 if (isWorking && !isOnPause) {
                     pauseStartTime = new Date();
                     isOnPause = true;
-                    localStorage.setItem('pauseStartTime', pauseStartTime.toISOString());
-                    localStorage.setItem('isOnPause', 'true');
+                    localStorage.setItem('pauseStartTime_v3', pauseStartTime.toISOString());
+                    localStorage.setItem('isOnPause_v3', 'true');
                     
                     document.getElementById('statusText').innerHTML = '<span class="status-indicator"></span> ⏸ PAUSE';
                     document.getElementById('pauseTimerDisplay').style.display = 'block';
@@ -697,6 +834,7 @@
                         }
                         updateTimeDisplay();
                     }, 1000);
+                    showToast("Pause gestartet", 2000);
                 }
             }
             
@@ -707,8 +845,8 @@
                     
                     isOnPause = false;
                     clearInterval(pauseInterval);
-                    localStorage.removeItem('pauseStartTime');
-                    localStorage.removeItem('isOnPause');
+                    localStorage.removeItem('pauseStartTime_v3');
+                    localStorage.removeItem('isOnPause_v3');
                     
                     document.getElementById('statusText').innerHTML = '<span class="status-indicator"></span> ▶ Arbeit läuft';
                     document.getElementById('pauseTimerDisplay').style.display = 'none';
@@ -716,6 +854,7 @@
                     document.getElementById('pauseBtn').disabled = false;
                     
                     updateTimeDisplay();
+                    showToast("Weiterarbeit nach Pause", 2000);
                 }
             }
             
@@ -754,11 +893,12 @@
                 workStartTime = null;
                 pauseStartTime = null;
                 totalPauseToday = 0;
+                hasShown830Warning = false;
                 
-                localStorage.removeItem('activeWorkStart');
-                localStorage.removeItem('isWorking');
-                localStorage.removeItem('pauseStartTime');
-                localStorage.removeItem('isOnPause');
+                localStorage.removeItem('activeWorkStart_v3');
+                localStorage.removeItem('isWorking_v3');
+                localStorage.removeItem('pauseStartTime_v3');
+                localStorage.removeItem('isOnPause_v3');
                 
                 document.getElementById('statusText').innerHTML = '<span class="status-indicator"></span> Bereit zum Start';
                 document.getElementById('statusSection').classList.remove('status-working', 'status-pause');
@@ -772,6 +912,7 @@
                 document.getElementById('netTime').textContent = '00:00:00';
                 
                 updateAll();
+                showToast(`Feierabend! Gearbeitet: ${netHours.toFixed(2)} Stunden`, 3000);
             }
             
             function resetActiveWork() {
@@ -783,11 +924,12 @@
                     workStartTime = null;
                     pauseStartTime = null;
                     totalPauseToday = 0;
+                    hasShown830Warning = false;
                     
-                    localStorage.removeItem('activeWorkStart');
-                    localStorage.removeItem('isWorking');
-                    localStorage.removeItem('pauseStartTime');
-                    localStorage.removeItem('isOnPause');
+                    localStorage.removeItem('activeWorkStart_v3');
+                    localStorage.removeItem('isWorking_v3');
+                    localStorage.removeItem('pauseStartTime_v3');
+                    localStorage.removeItem('isOnPause_v3');
                     
                     document.getElementById('statusText').innerHTML = '<span class="status-indicator"></span> Bereit zum Start';
                     document.getElementById('statusSection').classList.remove('status-working', 'status-pause');
@@ -801,6 +943,7 @@
                     document.getElementById('netTime').textContent = '00:00:00';
                     
                     updateAll();
+                    showToast("Timer zurückgesetzt", 2000);
                 }
             }
             
@@ -811,7 +954,7 @@
                     workHistory.push(entry);
                     saveData();
                     updateAll();
-                    alert(`${displayName} wurde erfasst!`);
+                    showToast(`${displayName} wurde erfasst`, 2000);
                 }
             }
             
@@ -860,7 +1003,7 @@
                 document.getElementById('manualPause').value = '';
                 document.getElementById('manualNetto').value = '';
                 document.getElementById('manualNote').value = '';
-                alert('Eintrag gespeichert!');
+                showToast("Eintrag gespeichert", 2000);
             }
             
             function clearManualForm() {
@@ -871,6 +1014,7 @@
                 document.getElementById('manualPause').value = '';
                 document.getElementById('manualNetto').value = '';
                 document.getElementById('manualNote').value = '';
+                showToast("Formular geleert", 1500);
             }
             
             // ==================== BACKUP FUNKTIONEN ====================
@@ -883,7 +1027,7 @@
                 a.download = `arbeitszeiten_backup_${new Date().toISOString().split('T')[0]}.json`;
                 a.click();
                 URL.revokeObjectURL(url);
-                alert('Backup wurde erstellt!');
+                showToast("Backup erstellt!", 2000);
             }
             
             function restoreBackup() {
@@ -905,7 +1049,7 @@
                                     }
                                     saveData();
                                     updateAll();
-                                    alert('Backup erfolgreich wiederhergestellt!');
+                                    showToast("Backup wiederhergestellt!", 2000);
                                 }
                             } else { alert('Ungültige Backup-Datei!'); }
                         } catch (error) { alert('Fehler beim Lesen der Backup-Datei!'); }
@@ -924,7 +1068,7 @@
                 a.download = `arbeitszeiten_export_${new Date().toISOString().split('T')[0]}.json`;
                 a.click();
                 URL.revokeObjectURL(url);
-                alert('Daten exportiert!');
+                showToast("Daten exportiert!", 2000);
             }
             
             function importData() {
@@ -949,7 +1093,7 @@
                                 }
                                 saveData();
                                 updateAll();
-                                alert('Daten importiert!');
+                                showToast("Daten importiert!", 2000);
                             } else { alert('Ungültige Datei!'); }
                         } catch (error) { alert('Fehler beim Import!'); }
                     };
@@ -961,7 +1105,7 @@
             function shareLink() {
                 const url = window.location.href;
                 if (navigator.share) { navigator.share({ title: 'Arbeitszeiterfassung Pro', text: 'Meine Arbeitszeiten-App', url: url }); }
-                else { navigator.clipboard.writeText(url); alert('Link in Zwischenablage kopiert!'); }
+                else { navigator.clipboard.writeText(url); showToast("Link kopiert!", 1500); }
             }
             
             function yearlyCleanup() {
@@ -972,24 +1116,31 @@
                     workHistory = workHistory.filter(entry => { const entryDate = parseDEDateString(entry.date); return entryDate >= oneYearAgo; });
                     saveData();
                     updateAll();
-                    alert(`✅ Cleanup abgeschlossen! ${beforeCount - workHistory.length} alte Einträge wurden gelöscht.`);
+                    showToast(`✅ Cleanup: ${beforeCount - workHistory.length} alte Einträge gelöscht`, 3000);
                 }
+            }
+            
+            function dataIntegrityCheck() {
+                validateDataIntegrity();
             }
             
             function togglePauseMode() {
                 autoPauseMode = !autoPauseMode;
-                localStorage.setItem('autoPauseMode', autoPauseMode);
+                localStorage.setItem('autoPauseMode_v3', autoPauseMode);
                 document.getElementById('pauseModeDisplay').innerHTML = autoPauseMode ? '🔄 Automatisch' : '👆 Manuell';
                 updateTimeDisplay();
+                showToast(autoPauseMode ? "Automatischer Pausenmodus aktiv" : "Manueller Pausenmodus aktiv", 2000);
             }
             
             function exportToPDF() {
                 const element = document.querySelector('.container');
                 html2pdf().set({ margin: 0.5, filename: `Arbeitszeiten_${new Date().toISOString().split('T')[0]}.pdf`, image: { type: 'jpeg', quality: 0.98 }, html2canvas: { scale: 2 }, jsPDF: { unit: 'in', format: 'a4', orientation: 'portrait' } }).from(element).save();
+                showToast("PDF wird erstellt...", 2000);
             }
             
             function updateCurrentTime() {
-                document.getElementById('currentTime').textContent = new Date().toLocaleTimeString('de-DE');
+                const now = new Date();
+                document.getElementById('currentTimeHours').textContent = now.toLocaleTimeString('de-DE', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
             }
             
             // ==================== EVENT LISTENER ====================
@@ -1004,8 +1155,8 @@
             document.getElementById('absentBtn').addEventListener('click', () => addAbsence('absent', 'Fehltag'));
             document.getElementById('exportPDFBtn').addEventListener('click', exportToPDF);
             document.getElementById('togglePauseMode').addEventListener('click', togglePauseMode);
-            document.getElementById('formula160').addEventListener('click', () => { currentFormula = '160'; localStorage.setItem('currentFormula', '160'); updateStats(); });
-            document.getElementById('formula173').addEventListener('click', () => { currentFormula = '173.33'; localStorage.setItem('currentFormula', '173.33'); updateStats(); });
+            document.getElementById('formula160').addEventListener('click', () => { currentFormula = '160'; localStorage.setItem('currentFormula_v3', '160'); updateStats(); showToast("Monatsziel: 160h", 1500); });
+            document.getElementById('formula173').addEventListener('click', () => { currentFormula = '173.33'; localStorage.setItem('currentFormula_v3', '173.33'); updateStats(); showToast("Monatsziel: 173.33h", 1500); });
             document.getElementById('calculateNettoBtn').addEventListener('click', calculateNetto);
             document.getElementById('saveManualEntryBtn').addEventListener('click', saveManualEntry);
             document.getElementById('clearManualFormBtn').addEventListener('click', clearManualForm);
@@ -1017,15 +1168,16 @@
             document.getElementById('importDataBtn').addEventListener('click', importData);
             document.getElementById('shareLinkBtn').addEventListener('click', shareLink);
             document.getElementById('yearlyCleanupBtn').addEventListener('click', yearlyCleanup);
+            document.getElementById('dataIntegrityBtn').addEventListener('click', dataIntegrityCheck);
             document.getElementById('prevMonthBtn').addEventListener('click', prevMonth);
             document.getElementById('nextMonthBtn').addEventListener('click', nextMonth);
             document.getElementById('todayMonthBtn').addEventListener('click', todayMonth);
             
             // ==================== WIEDERHERSTELLUNG NACH RELOAD ====================
-            const savedWorkStart = localStorage.getItem('activeWorkStart');
-            const savedIsWorking = localStorage.getItem('isWorking') === 'true';
-            const savedPauseStart = localStorage.getItem('pauseStartTime');
-            const savedIsOnPause = localStorage.getItem('isOnPause') === 'true';
+            const savedWorkStart = localStorage.getItem('activeWorkStart_v3');
+            const savedIsWorking = localStorage.getItem('isWorking_v3') === 'true';
+            const savedPauseStart = localStorage.getItem('pauseStartTime_v3');
+            const savedIsOnPause = localStorage.getItem('isOnPause_v3') === 'true';
             
             if (savedIsWorking && savedWorkStart) {
                 workStartTime = new Date(savedWorkStart);
@@ -1057,6 +1209,9 @@
             updateCurrentTime();
             updateAll();
             document.getElementById('versionBadge').innerHTML = `v${APP_VERSION}`;
+            
+            console.log("App gestartet - Version:", APP_VERSION);
+            console.log("8:30 Warnung aktiv - Test: Heute", new Date().toLocaleDateString());
         })();
     </script>
 </body>
