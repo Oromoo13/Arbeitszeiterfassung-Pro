@@ -18,9 +18,3 @@ Arbeitszeiterfassung Pro
 ✅ Keine Cloud
 ✅ DSGVO-konform
 ✅ Kostenlos
-// NEUE Funktionen:
-exportMonthPDF()   // Monatsbericht
-exportWeekPDF()    // Wochenbericht  
-exportYearPDF()    // Jahresbericht
-exportCustomPDF()  // Benutzerdefinierter Zeitraum
-exportFullPDF()    // Komplettbericht (bestehend)
